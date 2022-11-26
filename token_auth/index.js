@@ -1,4 +1,4 @@
-const uuid = require('uuid');
+const jwt = require('jsonwebtoken');
 const express = require('express');
 const onFinished = require('on-finished');
 const bodyParser = require('body-parser');
@@ -8,9 +8,19 @@ const fs = require('fs');
 
 const app = express();
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.urlencoded({extended: true}));
 
 const SESSION_KEY = 'Authorization';
+
+const getJwt = () => {
+    return jwt.sign(
+        {},
+        "secretJwtKey",
+        {
+            expiresIn: "30m"
+        }
+    );
+}
 
 class Session {
     #sessions = {}
@@ -21,7 +31,7 @@ class Session {
             this.#sessions = JSON.parse(this.#sessions.trim());
 
             console.log(this.#sessions);
-        } catch(e) {
+        } catch (e) {
             this.#sessions = {};
         }
     }
@@ -43,7 +53,7 @@ class Session {
     }
 
     init(res) {
-        const sessionId = uuid.v4();
+        const sessionId = getJwt();
         this.set(sessionId);
 
         return sessionId;
@@ -91,7 +101,7 @@ app.get('/', (req, res) => {
             logout: 'http://localhost:3000/logout'
         })
     }
-    res.sendFile(path.join(__dirname+'/index.html'));
+    res.sendFile(path.join(__dirname + '/index.html'));
 })
 
 app.get('/logout', (req, res) => {
@@ -113,7 +123,7 @@ const users = [
 ]
 
 app.post('/api/login', (req, res) => {
-    const { login, password } = req.body;
+    const {login, password} = req.body;
 
     const user = users.find((user) => {
         if (user.login == login && user.password == password) {
@@ -126,7 +136,7 @@ app.post('/api/login', (req, res) => {
         req.session.username = user.username;
         req.session.login = user.login;
 
-        res.json({ token: req.sessionId });
+        res.json({token: req.sessionId});
     }
 
     res.status(401).send();
