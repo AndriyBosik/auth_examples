@@ -1,14 +1,14 @@
 const axios = require("axios");
 
-const PASSWORD_GRANT_TYPE = "http://auth0.com/oauth/grant-type/password-realm";
-const CLIENT_CREDENTIALS_GRANT_TYPE = "client_credentials";
-const AUTHORIZATION_CODE_GRANT_TYPE = "authorization_code";
-const REFRESH_TOKEN_GRANT_TYPE = "refresh_token";
-const SCOPE = "offline_access openid";
-const CLIENT_ID = "JIvCO5c2IBHlAe2patn6l6q5H35qxti0";
-const CLIENT_SECRET = "ZRF8Op0tWM36p1_hxXTU-B0K_Gq_-eAVtlrQpY24CasYiDmcXBhNS6IJMNcz1EgB";
-const AUDIENCE = "https://kpi.eu.auth0.com/api/v2/";
-const CONNECTION = "Username-Password-Authentication";
+const PASSWORD_GRANT_TYPE = process.env.PASSWORD_GRANT_TYPE;
+const CLIENT_CREDENTIALS_GRANT_TYPE = process.env.CLIENT_CREDENTIALS_GRANT_TYPE;
+const AUTHORIZATION_CODE_GRANT_TYPE = process.env.AUTHORIZATION_CODE_GRANT_TYPE;
+const REFRESH_TOKEN_GRANT_TYPE = process.env.REFRESH_TOKEN_GRANT_TYPE;
+const SCOPE = process.env.SCOPE;
+const CLIENT_ID = process.env.CLIENT_ID;
+const CLIENT_SECRET = process.env.CLIENT_SECRET;
+const AUDIENCE = process.env.AUDIENCE;
+const CONNECTION = process.env.CONNECTION;
 
 const getApiToken = async () => {
     const response = await axios.post("https://kpi.eu.auth0.com/oauth/token", {
