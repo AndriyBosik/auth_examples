@@ -2,7 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const path = require('path');
 const port = 3000;
-const {login, register, refresh} = require("./auth");
+const {login, register, refresh, loginByCode} = require("./auth");
 const {auth} = require("express-oauth2-jwt-bearer");
 
 const app = express();
@@ -19,8 +19,8 @@ app.get('/', (req, res) => {
 });
 
 app.post('/api/login', async (req, res) => {
-    const {username, password} = req.body;
-    const access = await login(username, password);
+    const {code, redirectUri} = req.body;
+    const access = await loginByCode(code, redirectUri);
 
     if (access) {
         res.json(access);

@@ -2,6 +2,7 @@ const axios = require("axios");
 
 const PASSWORD_GRANT_TYPE = "http://auth0.com/oauth/grant-type/password-realm";
 const CLIENT_CREDENTIALS_GRANT_TYPE = "client_credentials";
+const AUTHORIZATION_CODE_GRANT_TYPE = "authorization_code";
 const REFRESH_TOKEN_GRANT_TYPE = "refresh_token";
 const SCOPE = "offline_access openid";
 const CLIENT_ID = "JIvCO5c2IBHlAe2patn6l6q5H35qxti0";
@@ -21,6 +22,31 @@ const getApiToken = async () => {
         }
     });
     return response.data.access_token;
+}
+
+const loginByCode = async (code, redirectUri) => {
+    try {
+        const response = await axios.post("https://kpi.eu.auth0.com/oauth/token", {
+            grant_type: AUTHORIZATION_CODE_GRANT_TYPE,
+            client_id: CLIENT_ID,
+            client_secret: CLIENT_SECRET,
+            code: code,
+            redirect_uri: redirectUri
+        }, {
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'Accept-Encoding': 'application/json'
+            }
+        });
+        return {
+            accessToken: response.data.access_token,
+            refreshToken: response.data.refresh_token,
+            idToken: response.data.id_token
+        }
+    } catch (error) {
+        return null;
+    }
 }
 
 const login = async (username, password) => {
@@ -90,6 +116,7 @@ const refresh = async refreshToken => {
 
 module.exports = {
     login,
+    loginByCode,
     register,
     refresh
 };
