@@ -168,6 +168,9 @@
     }
 
     const showMessage = (text, type = "error") => {
+        if (text.response.status === 401) {
+            document.location.href = "/";
+        }
         message.innerText = text;
         message.classList.remove("error");
         message.classList.remove("success");
@@ -211,14 +214,19 @@
         const expired = !accessToken || parseJwt(accessToken).exp * 1000 - now < 5000;
         if (expired) {
             access.accessToken = await refreshAccessToken(access.refreshToken);
-            console.log(access);
             localStorage.setItem("access", JSON.stringify(access));
         }
-        callback(access.accessToken);
+        callback(access.accessToken).catch(async error => {
+            if (error.request.status === 401) {
+                access.accessToken = await refreshAccessToken(access.refreshToken);
+                localStorage.setItem("access", JSON.stringify(access));
+                callback(access.accessToken).catch(error => showMessage(error));
+            }
+        });
     }
 
     const showPrivateContent = accessToken => {
-        axios.get("/api/private", {
+        return axios.get("/api/private", {
             headers: {
                 'Authorization': `Bearer ${accessToken}`
             }
@@ -226,9 +234,7 @@
             if (response.data.message) {
                 showMessage(response.data.message, "success");
             }
-        }).catch(error => {
-            showMessage(error);
-        })
+        });
     }
 
     if (access) {
